@@ -1,0 +1,72 @@
+#! /bin/sh
+
+if [ -z "$ILCSOFT" ]; then
+    echo " You should source an init_ilcsoft.sh script"
+    exit
+fi
+
+mkbuild()
+{
+    if [ -d build ]; then
+	rm -r build
+    fi
+    mkdir build
+}
+
+dictgen()
+{
+    echo "============================================================"
+    echo "=                 Generate a Cint Dictionary               ="
+    echo "============================================================"    
+    
+    
+    if [ -e ${PWD}/source/EveDisplay/src/rootdict.cc ]; then
+	echo "The file rootdict.cc is allrady exist .."
+	rm ${PWD}/source/EveDisplay/src/rootdict.*
+	rootcint ${PWD}/source/EveDisplay/src/rootdict.cc -c ${PWD}/source/EveDisplay/include/EveDisplay.h ${PWD}/source/EveDisplay/include/DisplayLinkDef.h
+    else
+	echo "Create a new dictionary rootdict.cc .."
+	rootcint ${PWD}/source/EveDisplay/src/rootdict.cc -c ${PWD}/source/EveDisplay/include/EveDisplay.h ${PWD}/source/EveDisplay/include/DisplayLinkDef.h
+    fi 
+}
+
+build()
+{
+    echo "============================================================"
+    echo "=                 Build Makefile for compilation           ="
+    echo "============================================================"    
+    echo "---------->  Create a new Makefile  .. "
+    cd ${PWD}/build
+    cmake -C ${ILCSOFT}/ILCSoft.cmake ..
+    ls -lthr
+    cd ${PWD}/..
+}
+
+compile()
+{
+    echo "============================================================"
+    echo "=                      Compilation                         ="
+    echo "============================================================"
+    echo "---------->  Compilation  .. "
+    cd ${PWD}/build
+    make install
+    cd ${PWD}/..
+}
+
+#The script
+
+#WHAT=$1
+#
+#if [ "$WHAT" == "Full" ]; then
+#    generateRootDict
+#    CreateBuildDir
+#    cd build
+#    CreateMakefile
+#    cd ..
+#fi
+#
+#cd build
+#Compile
+#echo " Compilation done"
+
+

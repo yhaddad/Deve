@@ -1,0 +1,20 @@
+#include "EvePFO.h"
+
+
+EvePFO::EvePFO(){
+  this->test = 0;
+  std::cout << "EvePFO ... initialized !!! " << std::endl;
+}
+
+
+//TEveElementList* EvePFO::VisualizePFO(const LCCollection * col, const string name){
+//  try{
+//    unsigned int npart = col->getNumberOfElements();
+//    for(int ipart=0; ipart < npart; ipart++ ){
+//      ReconstructedParticle *reco_part = dynamic_cast<ReconstructedParticle*>(col->getElementAt(ipart));
+//      // do somting with reco part ..... 
+//      std::cout << ".... type == " << reco_part->getType() << "...." << std::endl; 
+//    }
+//  }
+//}
+

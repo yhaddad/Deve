@@ -1,0 +1,218 @@
+
+//--- LCIO deps 
+#include "lcio.h"
+#include "IO/LCReader.h"
+#include "IMPL/LCTOOLS.h"                                                             
+#include "EVENT/LCRunHeader.h"                                                        
+#include "UTIL/Operators.h"
+#include "UTIL/LCIterator.h"
+#include "EVENT/ReconstructedParticle.h"
+
+//--- C/C++ deps
+#include <cstdlib>                                                                    
+#include <sstream>
+
+//--- ROOT Deps
+#include "TSystem.h"
+#include "TRint.h"
+#include "TROOT.h"
+
+//---- TEve Deps
+
+#include <TEveManager.h>
+#include <TEveViewer.h>
+#include <TGLViewer.h>
+#include <TEveScene.h>
+#include <TEveElement.h>
+#include <TEveTrack.h>
+#include "TEveTrackPropagator.h"
+#include <TEveProjectionManager.h>
+#include <TEveProjectionAxes.h>
+#include <TEveBrowser.h>
+#include <TEveWindow.h>
+#include <TEveGeoShape.h>
+#include <TGeoTube.h>
+
+#include "DeveDisplay.h"
+#include "EventLoader.h"
+
+static std::vector<std::string> FILEN ;
+
+using namespace std ;
+using namespace lcio;
+
+//class DeveDisplay;
+
+//TEveElementList *gJetList      = 0;
+//TEveTrackList   *gTrackList    = 0;
+//DeveDisplay     *gDeveDisplay  = 0;
+
+EventLoader *m_loadevent = 0;
+
+//--- some prams 
+//Double_t gRadius = 1.29;
+//Double_t gHalfLength = 3.0;
+//Double_t gBz = 3.8;
+
+
+// file name
+
+//void initialize_eve();
+//void load_event(int event_id);
+
+
+
+int main(int argc, char** argv ){                                                                   
+  
+  int runNumber=0 ;
+  int evtNumber=0 ;
+  int nthEvent=1  ;
+  
+  // read file names from command line (only argument)                                              
+  if( argc < 4) {                                                                                   
+    cout << "  deve filename n      " << endl ;
+    cout << "  set the environment variable LCIO_READ_COL_NAMES to a space separated list" << endl ;
+    cout << "  of collection names that you would like to dump (all are dumped if not set)" << endl ;
+    exit(1) ;                                                                                       
+  }                
+  std::string lcio_file_name( argv[1] ) ;
+  std::string colName( argv[2] ) ;
+  bool dumpNthEvent( argc == 4 ) ;
+  
+  if( dumpNthEvent ) {
+    nthEvent  = atoi( argv[3] ) ;
+    if( nthEvent < 1 ) {
+      cout << " usage: lcio_draw_event filename n   -   whith  n > 0 !  " << endl ;
+      exit(1) ;
+    }
+  }else{
+    runNumber = atoi( argv[3] ) ;
+    evtNumber = atoi( argv[4] ) ;
+  }
+  //--- LCIO reader
+  LCReader* lcReader = LCFactory::getInstance()->createLCReader(LCReader::directAccess) ;
+  LCEvent* evt(0) ;
+  try{
+    lcReader->open( lcio_file_name.c_str() ) ;
+    if( dumpNthEvent ){
+      if( nthEvent > 1 )
+	lcReader->skipNEvents(  nthEvent - 1 ) ;
+      evt = lcReader->readNextEvent() ; 
+    }else{
+      evt = lcReader->readEvent(runNumber,  evtNumber) ; 
+    }
+    
+    if( !evt  ){
+      if(dumpNthEvent){
+	cout << " less than " << nthEvent << "  events in  file " << lcio_file_name.c_str() << endl ;    
+      }else{
+	cout << " couldn't find event " << evtNumber << " - run " << runNumber 
+	     << " in file " << lcio_file_name.c_str() << endl ;    
+      } 
+      exit(1);
+    }
+    // ---  ROOT TRint ---- 
+    TRint *root_interface = new TRint("Deve via ROOT",0,0);
+    TEveManager::Create();
+    //initialize_eve();
+    
+    // --- event loop
+    //m_loadevent = m_loadevent->get_instance();
+    //m_loadevent->load_event(evt);
+    
+    
+    
+  
+    
+    //---- draw + run root 
+    
+    gEve->Redraw3D(kTRUE);
+    root_interface->Run();
+  
+    lcReader->close() ;
+  
+    // --- close the reader
+  
+  }  catch( IOException& e) {
+    cout << e.what() << endl ;
+    exit(1) ;
+  }
+  return 0;
+}
+  
+  
+// void initialize_eve()
+// {
+  
+
+//   // --- track list 
+//   gTrackList = new TEveTrackList("Tracks");
+//   gTrackList->SetMainColor(kBlue);
+//   gTrackList->SetMarkerColor(kRed);
+//   gTrackList->SetMarkerStyle(kCircle);
+//   gTrackList->SetMarkerSize(0.5);
+//   gEve->AddElement(gTrackList);
+  
+//   TEveTrackPropagator *trkProp = gTrackList->GetPropagator();
+//   trkProp->SetMagField(0.0, 0.0, -gBz);
+//   trkProp->SetMaxR(gRadius*100.0);
+//   trkProp->SetMaxZ(gHalfLength*100.0);
+//   // -- generic geometry 
+//   TEveElementList *geometry = new TEveElementList("Geometry");
+//   TEveGeoShape *barell = new TEveGeoShape("Barell");
+//   barell->SetShape(new TGeoTube(gRadius*100.0 - 1, gRadius*100.0, gHalfLength*100.0));
+//   barell->SetMainColor(kCyan);
+//   barell->SetMainTransparency(80);
+//   geometry->AddElement(barell);
+  
+//   //TEveCalo3D *calo = new TEveCalo3D(gCaloData);
+//   //calo->SetBarrelRadius(gRadius*100.0);
+//   //calo->SetEndCapPos(gHalfLength*100.0);
+
+//   //gStyle->SetPalette(1, 0);
+//   //TEveCaloLego *lego = new TEveCaloLego(gCaloData);
+//   //lego->InitMainTrans();
+//   //lego->RefMainTrans().SetScale(TMath::TwoPi(), TMath::TwoPi(), TMath::Pi());
+//   //lego->SetAutoRebin(kFALSE);
+//   //lego->Set2DMode(TEveCaloLego::kValSizeOutline);
+  
+//   gDeveDisplay = new DeveDisplay;
+//   gEve->AddGlobalElement(geometry);
+//   //gEve->AddGlobalElement(calo);
+//   gDeveDisplay->ImportGeomRPhi(geometry);
+//   //gDeveDisplay->ImportCaloRPhi(calo);
+//   gDeveDisplay->ImportGeomRhoZ(geometry);
+//   //gDeveDisplay->ImportCaloRhoZ(calo);
+//   //gDeveDisplay->ImportCaloLego(lego);
+// }
+
+// void load_event(int event_id){
+  
+//   //std::cout << "***************************************" << std::endl;
+//   //std::cout << "*    Deve MC displayer                 " << std::endl;
+//   //std::cout << "*    Event == \t"            << event_id << std::endl;
+//   //std::cout << "***************************************" << std::endl;
+//   //
+//   //try{
+//   //  if(runNumber == -1){ 
+//   //    lcReader->skipNEvents(EventNum);
+//   //    evt = lcReader->readNextEvent();
+//   //    runNumber = evt->getRunNumber();
+//   //    if(evt) event_id = evt->getEventNumber();
+//   //  }else{
+//   //    evt = lcReader->readEvent(runNumber, EventNum);
+//   //  }
+//   //  if( !evt ){
+//   //    std::cout<<"::: EROOR! ::  Event not exist :( " << endl;
+//   //  }else{
+//   //    event_id = evt->getEventNumber();
+//   //    std::cout << "*    Detector == \t"<<  evt->getDetectorName() << std::endl;
+//   //    //load_collections(evt,"");
+//   //    
+//   //
+//   //  }
+//   //  
+//   //}catch (lcio::DataNotAvailableException zero) {
+//   //  cout << "::: EROOR! ::  Event not exist :( " << endl;
+//   //}
+// }

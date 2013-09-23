@@ -1,0 +1,33 @@
+/** 
+ *  @file  EventLoader
+ *  @brief event loader 
+ */
+
+#ifndef _EVENTLOADER_H
+#define _EVENTLOADER_H 1
+
+
+
+class TEveElement;
+class TGeoShape;
+class TGeoVolume;
+class TGeoMedium;
+
+class EventLoader{
+ public:
+  /**
+   *  @brief  Event Loader navigator
+   */
+  static EventLoader *getInstance();
+  
+  /**
+   *  @brief Show the Eve Event-display and pause.
+   */
+  void load_event();
+    
+  void view_event();
+  
+
+};
+#endif /* _EVENTLOADER_H */
+
