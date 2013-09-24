@@ -67,7 +67,7 @@ namespace deve {
 			* @brief Default destructor
 			*
 			*/
-			virtual ~ObjectLoader();
+			virtual ~ObjectLoader() {}
 
 			/*!
 			 *
