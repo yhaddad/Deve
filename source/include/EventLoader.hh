@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with XXX.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * @author : Eté Rémi
+ * @author : Etï¿½ Rï¿½mi
  * @version
  * @copyright
  *
@@ -37,36 +37,56 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <map>
+
+// lcio includes
+#include "EVENT/LCIO.h"
+#include "EVENT/LCEvent.h"
+
+// deve includes
+#include "ObjectLoader.hh"
+#include "EventDisplay.hh"
 
 namespace deve {
 
-/*! 
- * 
- * @brief  EventLoader class
- * 
- */ 
 
-class EventLoader {
+	class EventDisplay;
 
-  public:
-    /*!
-     *
-     * @brief  Default constructor 
-     *
-     */
-    EventLoader();
+	/*!
+	*
+	* @brief  EventLoader class
+	*
+	*/
+	class EventLoader {
 
-    /*!
-     *
-     * @brief  Default destructor 
-     *
-     */
-    virtual ~EventLoader();
+		public:
 
-  protected:
+			/*!
+			*
+			* @brief  Default constructor
+			*
+			*/
+			EventLoader();
+
+			/*!
+			*
+			* @brief  Default destructor
+			*
+			*/
+			virtual ~EventLoader();
+
+			/*!
+			 *
+			 * @brief Load an event with a given list of object loaders
+			 *
+			 */
+			void loadEvent( EVENT::LCEvent * , std::map<std::string , ObjectLoader *> &objLoaders );
 
 
-};  // class 
+		protected:
+
+
+	};  // class
 
 }  // namespace 
 
