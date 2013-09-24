@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with XXX.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * @author : Eté Rémi
+ * @author : Etï¿½ Rï¿½mi
  * @version
  * @copyright
  *
@@ -31,15 +31,100 @@
 
 #include "EventDisplay.hh"
 
+using namespace std;
+using namespace EVENT;
+using namespace IOIMPL;
+
 namespace deve {
 
-EventDisplay::EventDisplay() {
+	TEveManager *EventDisplay::eveManager = 0;
 
-}
 
-EventDisplay::~EventDisplay() {
+	EventDisplay::EventDisplay()
+		: isInitialized( false ) {
 
-}
+		lcReader = LCFactory::getInstance()->createLCReader();
+		eventLoader = new EventLoader();
+	}
+
+	EventDisplay::~EventDisplay() {
+
+		delete eventLoader;
+		eventLoader = 0;
+		TEveManager::Terminate();
+		eveManager = 0;
+	}
+
+	void EventDisplay::initialize() {
+
+		if( isInitialized )
+			return;
+
+		eveManager = TEveManager::Create();
+		isInitialized = true;
+	}
+
+	void EventDisplay::registerObjectLoader( ObjectLoader *objLoader ) {
+
+		if( objLoader == 0 )
+			return;
+
+		if( objectLoaders.find( objLoader->getObjectType() ) != objectLoaders.end() )
+			return;
+
+		objectLoaders[ objLoader->getObjectType() ] = objLoader;
+		return;
+	}
+
+	void EventDisplay::pause() {
+
+		#ifdef __unix__
+			std::cout << "Press return to continue ..." << std::endl;
+			int flag = fcntl(1, F_GETFL, 0);
+
+			int key = 0;
+			while(true)
+			{
+				gSystem->ProcessEvents();
+				fcntl(1, F_SETFL, flag | O_NONBLOCK);
+				key = getchar();
+
+				if((key == '\n') || (key == '\r'))
+					break;
+
+				usleep(1000);
+			}
+
+			fcntl(1, F_SETFL, flag);
+		#else
+			std::cout << "EventDisplay::pause() is only implemented for unix operating systems." << std::endl;
+		#endif
+	}
+
+	void EventDisplay::loadLcioFile( const std::string &fileName ) {
+
+		lcReader->open( fileName );
+		currentEvent = lcReader->readNextEvent();
+		eventLoader->loadEvent( currentEvent , objectLoaders );
+	}
+
+
+
+	void EventDisplay::loadEvent( int runNb , int evtNb ) {
+
+		LCEvent *previousEvent = currentEvent;
+
+		try {
+			currentEvent = lcReader->readEvent( runNb , evtNb );
+		}
+		catch( IOException &e ) {
+			cerr << "LCIO exception caught while loading event "+evtNb+" , run "+runNb+" : " << e.what() << endl;
+			currentEvent = previousEvent;
+			previousEvent = 0;
+		}
+		eventLoader->loadEvent( currentEvent , objectLoaders );
+	}
+
 
 
 }  // namespace 
