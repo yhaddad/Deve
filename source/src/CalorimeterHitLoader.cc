@@ -38,7 +38,8 @@
 #include "TEveRGBAPalette.h"
 #include "TStyle.h"
 
-
+// deve includes
+#include "EventDisplay.hh"
 
 using namespace std;
 using namespace EVENT;
@@ -51,6 +52,10 @@ namespace deve {
 	}
 
 	void CalorimeterHitLoader::loadObjectsFromLCCollection( LCCollection *lcCollection , const string &colName ) {
+
+		TEveManager *eveManager = EventDisplay::getEveManager();
+		if( eveManager == 0 )
+			return;
 
 		if( lcCollection == 0 )
 			throw invalid_argument("LCCollection is a NULL pointer!");
@@ -85,6 +90,7 @@ namespace deve {
 			calorimeterHits->AddElement( hitCellBox );
 		}
 
+		eveManager->AddElement( calorimeterHits );
 	}
 
 
