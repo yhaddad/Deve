@@ -1,0 +1,11 @@
+#ifndef DeveConfig_h
+#define DeveConfig_h 1
+
+// version macros
+#define Deve_MAJOR_VERSION @Deve_VERSION_MAJOR@
+#define Deve_MINOR_VERSION @Deve_VERSION_MINOR@
+#define Deve_PATCH_LEVEL @Deve_VERSION_PATCH@
+
+#define Deve_VERSION_GE( MAJV , MINV , PLEV )  ( (Deve_MAJOR_VERSION > MAJV) || ( (Deve_MAJOR_VERSION == MAJV) && (Deve_MINOR_VERSION > MINV) ) || ( (Deve_MAJOR_VERSION == MAJV) && (Deve_MINOR_VERSION == MINV) && (Deve_PATCH_LEVEL >= PLEV) ) )
+
+#endif // DeveConfig_h
