@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with XXX.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * @author : Eté Rémi
+ * @author : Etï¿½ Rï¿½mi
  * @version
  * @copyright
  *
@@ -31,15 +31,49 @@
 
 #include "EventLoader.hh"
 
+using namespace std;
+using namespace EVENT;
+
 namespace deve {
 
-EventLoader::EventLoader() {
+	EventLoader::EventLoader() {
 
-}
+	}
 
-EventLoader::~EventLoader() {
+	EventLoader::~EventLoader() {
 
-}
+	}
+
+	void EventLoader::loadEvent( LCEvent *evt , map<string , ObjectLoader*> &objLoaders ) {
+
+		if( evt == 0 )
+			return;
+
+		TEveManager *eveManager = EventDisplay::getEveManager();
+
+		if( eveManager == 0 )
+			return;
+
+		const vector<string> *collectionNames = evt->getCollectionNames();
+
+		for( unsigned int c=0 ; c<collectionNames->size() ; c++ ) {
+
+			cout << "Collection name : " << collectionNames->at( c ) << endl;
+
+			LCCollection *lcCollection = evt->getCollection( collectionNames->at( c ) );
+			map<string , ObjectLoader*>::iterator objLoaderIt = objLoaders.find( lcCollection->getTypeName() );
+
+			if( objLoaderIt == objLoaders.end() )
+				continue;
+			else {
+				objLoaderIt->second->loadObjectsFromLCCollection( lcCollection , collectionNames->at( c ) );
+			}
+		}
+
+		eveManager->Redraw3D();
+
+		return;
+	}
 
 
 }  // namespace 
