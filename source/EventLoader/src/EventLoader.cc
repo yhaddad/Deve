@@ -105,13 +105,14 @@ void EventLoader::load_event(LCEvent* evt)
   for(  name = col_names->begin() ; name != col_names->end() ; name++){
     LCCollection* col = evt->getCollection( *name ) ;
     if( col->getTypeName() == LCIO::RECONSTRUCTEDPARTICLE )
-    	gEve->AddElement(this->build_PFO(col));
+      gEve->AddElement(this->build_PFO(col));
   }
   
 }
 
 TEveElementList* EventLoader::build_PFO(LCCollection* col) {
 
+  
   TEveTrackList *gTrackList = new TEveTrackList();
   TEveTrackPropagator *trkProp = gTrackList->GetPropagator();
   trkProp->SetMagField(0.0, 0.0, -gBz);
@@ -128,15 +129,23 @@ TEveElementList* EventLoader::build_PFO(LCCollection* col) {
     ReconstructedParticle* part=dynamic_cast<ReconstructedParticle*>(col->getElementAt(i));
     cout << "part : " << part << endl;
     TEveRecTrack* deveTrack = new TEveRecTrack();
-    deveTrack->fV.Set( part->getStartVertex()->getPosition() );
+    //std::cout << "vx"<< part->getStartVertex()->getPosition()[0]
+    //	      << "vx"<< part->getStartVertex()->getPosition()[1]
+    //	      << "vx"<< part->getStartVertex()->getPosition()[2]
+    //	      << std::endl;
+    deveTrack->fV.Set(part->getReferencePoint());
+    //deveTrack->fV.Set();
+    
     deveTrack->fP.Set(part->getMomentum());
     deveTrack->fSign = part->getCharge();
     
     TEveTrack* track = new TEveTrack(deveTrack, trkProp);
     track->SetName(Form("Track %d", i));
-    //track->SetLineWidth(PFOParams[TrType].Width);
-    //track->SetLineColor(PFOParams[TrType].Color);
-    //track->SetLineStyle(PFOParams[TrType].Style);
+    
+    track->SetLineWidth(PFOParams[TrType].Width);
+    track->SetLineColor(PFOParams[TrType].Color);
+    track->SetLineStyle(PFOParams[TrType].Style);
+    
     track->SetSmooth(kTRUE);
     gTrackList->AddElement(track);
     
