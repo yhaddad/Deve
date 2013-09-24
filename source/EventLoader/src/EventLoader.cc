@@ -104,14 +104,15 @@ void EventLoader::load_event(LCEvent* evt)
   std::vector<std::string>::const_iterator name;
   for(  name = col_names->begin() ; name != col_names->end() ; name++){
     LCCollection* col = evt->getCollection( *name ) ;
-    gEve->AddElement(this->build_PFO(col));
+    if( col->getTypeName() == LCIO::RECONSTRUCTEDPARTICLE )
+    	gEve->AddElement(this->build_PFO(col));
   }
   
 }
 
-TEveElementList* EventLoader::build_PFO(LCCollection* col){
+TEveElementList* EventLoader::build_PFO(LCCollection* col) {
 
-  TEveTrackList *gTrackList = 0;   
+  TEveTrackList *gTrackList = new TEveTrackList();
   TEveTrackPropagator *trkProp = gTrackList->GetPropagator();
   trkProp->SetMagField(0.0, 0.0, -gBz);
   trkProp->SetMaxR(gRadius*100.0);
@@ -122,10 +123,12 @@ TEveElementList* EventLoader::build_PFO(LCCollection* col){
   //if(col_type != "ReconstructedParticle") continue;
   
   for(int i=0; i<col->getNumberOfElements(); i++){ // loop over part
+
+
     ReconstructedParticle* part=dynamic_cast<ReconstructedParticle*>(col->getElementAt(i));
-    
+    cout << "part : " << part << endl;
     TEveRecTrack* deveTrack = new TEveRecTrack();
-    deveTrack->fV.Set(part->getStartVertex()->getPosition());
+    deveTrack->fV.Set( part->getStartVertex()->getPosition() );
     deveTrack->fP.Set(part->getMomentum());
     deveTrack->fSign = part->getCharge();
     
@@ -158,7 +161,7 @@ void EventLoader::init_deve(){
   gDeveDisplay->ImportGeomRPhi(geometry);
   gDeveDisplay->ImportGeomRhoZ(geometry);
 
-  
-  gEve->Redraw3D(kTRUE);
+
+//  gEve->Redraw3D(kTRUE);
 
 }
