@@ -21,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with XXX.  If not, see <http://www.gnu.org/licenses/>.
  * 
- * @author : Eté Rémi
+ * @author : EtÃ© RÃ©mi
  * @version
  * @copyright
  *
@@ -37,36 +37,110 @@
 #include <cstdlib>
 #include <cmath>
 #include <vector>
+#include <fcntl.h>
+
+// lcio includes
+#include "IO/LCReader.h"
+#include "IOIMPL/LCFactory.h"
+
+// root includes
+#include "TEveManager.h"
+#include "TSystem.h"
+
+// deve include
+#include "ObjectLoader.hh"
+#include "EventLoader.hh"
 
 namespace deve {
 
-/*! 
- * 
- * @brief  EventDisplay class
- * 
- */ 
 
-class EventDisplay {
+	class EventLoader;
 
-  public:
-    /*!
-     *
-     * @brief  Default constructor 
-     *
-     */
-    EventDisplay();
+	/*!
+	*
+	* @brief  EventDisplay class
+	*
+	*/
+	class EventDisplay {
 
-    /*!
-     *
-     * @brief  Default destructor 
-     *
-     */
-    virtual ~EventDisplay();
+		public:
 
-  protected:
+			/*!
+			*
+			* @brief  Default constructor
+			*
+			*/
+			EventDisplay();
+
+			/*!
+			*
+			* @brief  Default destructor
+			*
+			*/
+			virtual ~EventDisplay();
+
+			/*!
+			 *
+			 * @brief Initialize the event display
+			 *
+			 */
+			void initialize();
+
+			/*!
+			 *
+			 * @brief Register an object loader
+			 *
+			 */
+			void registerObjectLoader( ObjectLoader * );
+
+			/*!
+			 *
+			 * @brief Return the object loaders
+			 *
+			 */
+			const std::map<std::string , ObjectLoader *> &getObjectLoaders() { return objectLoaders; }
+
+			/*!
+			 *
+			 * @brief Return the TEveManager
+			 *
+			 */
+			static TEveManager *getEveManager() { return eveManager; }
+
+			/*!
+			 *
+			 * @brief Pause the current thread to handle the eve Window correctly.
+			 * This has to be used in Marlin processor for example
+			 *
+			 */
+			void pause();
+
+			/*!
+			 *
+			 * @brief Load the lcio file and load the first event
+			 *
+			 */
+			void loadLcioFile( const std::string &fileName );
+
+			/*!
+			 *
+			 * @brief Load an event from the run id and event id.
+			 *
+			 */
+			void loadEvent( int runNb , int eventNb );
 
 
-};  // class 
+		protected:
+
+			std::map< std::string , ObjectLoader* > objectLoaders;    ///< The object loaders
+			static TEveManager *eveManager;
+			bool isInitialized;
+			EventLoader *eventLoader;
+			IO::LCReader *lcReader;
+			EVENT::LCEvent *currentEvent;
+
+
+	};  // class
 
 }  // namespace 
 
