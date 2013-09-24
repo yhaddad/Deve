@@ -1,0 +1,5 @@
+/build
+/lib
+/DeveConfig.cmake
+/DeveConfigVersion.cmake
+/FindDeve.cmake
