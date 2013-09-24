@@ -53,8 +53,8 @@ EventLoader::EventLoader() : m_event_id(-2)
 {
   TEveManager::Create();
 
-  root_interface = new TRint("Deve via ROOT",0,0);
-  root_interface->SetReturnFromRun(kTRUE);
+  //root_interface = new TRint("Deve via ROOT",0,0);
+  //root_interface->SetReturnFromRun(kTRUE);
 }
 
 EventLoader::~EventLoader()
@@ -158,6 +158,7 @@ void EventLoader::init_deve(){
   gDeveDisplay->ImportGeomRPhi(geometry);
   gDeveDisplay->ImportGeomRhoZ(geometry);
 
-
+  
   gEve->Redraw3D(kTRUE);
+
 }
